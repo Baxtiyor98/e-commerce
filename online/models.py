@@ -1,5 +1,5 @@
 from django.db import models
-from users.models import CustomUser
+from user.models import CustomUser
 
 
 class Category(models.Model):
@@ -42,6 +42,7 @@ class Cart(models.Model):
     def total_summa(self):
         self.total_price = sum(self.order_product.values_list('order_price', flat=True))
         self.save()
+        return self.total_price
 
     def __str__(self):
         return self.user.username
@@ -50,14 +51,14 @@ class Cart(models.Model):
 class Order_Product(models.Model):
     cart = models.ForeignKey(Cart, related_name="order_product", on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=0)
+    quantity = models.IntegerField(default=1)
     order_price = models.FloatField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property
     def summa(self):
-        self.order_price = self.product.price * (1 - (self.product.discount / 100)) * self.quantity
+        self.order_price = self.product.discount_price * self.quantity
         self.save()
 
     def __str__(self):
-        return self.cart.user.username
+        return self.product.name
