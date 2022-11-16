@@ -76,8 +76,23 @@ function add_product(id){
         }),
     }).then((response) => {
         response.json().then((data) => {
-            document.getElementById('quantity'+id.toString()).innerHTML = data.order_quantity
-            document.getElementById('total_price').innerHTML = data.total_price
+            html = ``
+            for(let i=0;i<data.data.length;i++){
+                html += `
+                    <li id="list_product${data.data[i].id}">
+                        <a onclick="remove_product(${data.data[i].id})" class="remove" title="Remove this item"><i class="fa fa-remove"></i></a>
+                        <a class="cart-img" href="#"><img src="${data.data[i].image}" alt="#"></a>
+                        <h4><a href="#">${data.data[i].name}</a></h4>
+                        <p class="quantity" ><span id="quantity${data.data[i].id}">${data.data[i].quantity}</span>x - <span class="amount">$${data.data[i].price}</span></p>
+                    </li>
+                `
+            }
+            item_count = document.getElementById('item_total_count')
+            item_count.style.display = 'inline'
+            item_count.innerHTML = data.count
+            document.getElementById('item_total_count(2)').innerHTML = data.count
+            document.getElementById('shopping_list').innerHTML = html
+            document.getElementById('total_price').innerHTML ='$'+data.total_price
             })
         })
 }
@@ -96,8 +111,21 @@ function remove_product(id){
         }),
     }).then((response) => {
         response.json().then((data) => {
-            let list_product =document.getElementById('list_product'+id.toString())
-            list_product.style.display = 'none'
+            console.log(data,typeof data.success)
+            if(data.success == true){
+                const list_product = document.getElementById('list_product'+id.toString())
+                list_product.style.display = 'none'
+            }
+
+            item_count = document.getElementById('item_total_count')
+            item_count.style.display = 'inline'
+            item_count.innerHTML = data.count
+
+            if(data.count === 0){
+                item_count.style.display = 'none'
+            }
+            document.getElementById('item_total_count(2)').innerHTML = data.count
+            document.getElementById('total_price').innerHTML ='$'+data.total_price
             })
         })
 }
